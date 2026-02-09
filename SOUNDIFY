@@ -1,0 +1,1 @@
+Soundify – A sleek, Spotify-inspired web music player featuring responsive design, playback controls, and album artwork display. Built to demonstrate modern UI/UX principles and designed for future full-stack music streaming integration.
