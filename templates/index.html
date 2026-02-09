@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soundify</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
+}
+
+body{
+  background:linear-gradient(135deg,#0a0a0a,#121212,#1b1b1b);
+  color:white;
+  min-height:100vh;
+}
+
+/* HEADER */
+.header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  backdrop-filter: blur(15px);
+  background:rgba(20,20,20,0.6);
+  padding:20px;
+  text-align:center;
+  font-size:38px;
+  font-weight:700;
+  color:#ec517d;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+/* SEARCH BAR */
+.search-box{
+  display:flex;
+  justify-content:center;
+  margin:30px 0;
+}
+
+.search-box input{
+  width:420px;
+  padding:14px 20px;
+  border-radius:30px;
+  border:none;
+  outline:none;
+  font-size:16px;
+  background:#181818;
+  color:white;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.05);
+  transition:0.3s;
+}
+
+.search-box input:focus{
+  box-shadow:0 0 15px rgba(236,81,125,0.4);
+}
+
+/* SONG GRID */
+.container{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:25px;
+  padding:30px;
+}
+
+/* SONG CARD */
+.card{
+  background:rgba(255,255,255,0.03);
+  padding:25px;
+  border-radius:20px;
+  cursor:pointer;
+  transition:0.35s;
+  border:1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(8px);
+}
+
+.card:hover{
+  transform:translateY(-8px) scale(1.02);
+  background:linear-gradient(135deg,#ec517d,#ff7aa2);
+  box-shadow:0 15px 40px rgba(236,81,125,0.35);
+}
+
+.card h3{
+  font-size:18px;
+  margin-bottom:6px;
+}
+
+.card p{
+  opacity:0.7;
+  font-size:14px;
+}
+
+/* PLAYER BAR */
+.player-bar{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:rgba(15,15,15,0.9);
+  backdrop-filter: blur(15px);
+  border-top:1px solid rgba(255,255,255,0.05);
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.player-bar p{
+  margin-bottom:8px;
+  font-weight:500;
+  color:#ec517d;
+}
+
+.player-bar audio{
+  width:70%;
+}
+
+@media(max-width:600px){
+  .search-box input{width:85%}
+  .player-bar audio{width:95%}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">Soundify 🎧</div>
+
+<div class="search-box">
+<input type="text" placeholder="Search song, artist..." onkeyup="searchSong(this.value)">
+</div>
+
+<div class="container" id="songs">
+
+{% for song in songs %}
+<div class="card" onclick="play('{{song.filename}}','{{song.title}}',{{song.id}})">
+<h3>{{song.title}}</h3>
+<p>{{song.artist}}</p>
+</div>
+{% endfor %}
+
+</div>
+
+<div class="player-bar">
+<p id="currentSong">Select a song to play</p>
+<audio id="player" controls></audio>
+</div>
+
+<script>
+function play(path,title,id){
+ document.getElementById("player").src = path;
+ document.getElementById("player").play();
+ document.getElementById("currentSong").innerText="Now Playing: "+title;
+}
+
+function searchSong(q){
+ fetch("/search?q="+q)
+ .then(r=>r.json())
+ .then(data=>{
+   let html="";
+   data.forEach(s=>{
+    html+=`
+    <div class="card" onclick="play('${s.filename}','${s.title}',${s.id})">
+    <h3>${s.title}</h3>
+    <p>${s.artist}</p>
+    </div>`;
+   });
+   document.getElementById("songs").innerHTML=html;
+ });
+}
+</script>
+
+</body>
+</html>
